@@ -21,11 +21,16 @@ public class Student {
     @Column(nullable = false, name = "name")
     private String name;
 
+    /*
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
     name = "registration",
     joinColumns = @JoinColumn(name = "student_id"),
     inverseJoinColumns = @JoinColumn(name = "course_id"))
     Set<Course> courseSet;
+     */
+
+    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    Set<CourseScore> scores;
 
 }

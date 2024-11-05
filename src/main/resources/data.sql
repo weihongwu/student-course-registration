@@ -9,7 +9,8 @@ INSERT INTO student (id, name) VALUES ('102', 'student two');
 INSERT INTO student (id, name) VALUES ('103', 'student three');
 INSERT INTO student (id, name) VALUES ('104', 'student four');
 
-INSERT INTO registration (student_id, course_id) VALUES ('101', '11');
+
+INSERT INTO course_score (student_id, course_id, score) VALUES ('101', '11', 85.5);
 
 
 

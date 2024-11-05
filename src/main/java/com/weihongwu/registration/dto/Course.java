@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Set;
 
 @Setter
@@ -22,6 +21,11 @@ public class Course {
     @Column(nullable = false, name = "name")
     private String name;
 
+    /*
     @ManyToMany(mappedBy = "courseSet", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     Set<Student> studentSet;
+     */
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    Set<CourseScore> score;
 }

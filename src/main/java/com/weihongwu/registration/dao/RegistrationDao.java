@@ -1,6 +1,8 @@
 package com.weihongwu.registration.dao;
 
 import com.weihongwu.registration.dto.Course;
+import com.weihongwu.registration.dto.CourseScore;
+import com.weihongwu.registration.dto.CourseScoreKey;
 import com.weihongwu.registration.dto.Student;
 import com.weihongwu.registration.exception.CourseNotFoundException;
 import com.weihongwu.registration.exception.StudentNotFoundException;
@@ -10,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Transactional
 @Repository
@@ -53,16 +54,22 @@ public class RegistrationDao {
     public Student registryCourse(String student_id, String course_id) throws CourseNotFoundException, StudentNotFoundException {
         Student student = findStudentById(student_id);
         Course course = findCourseById(course_id);
-        student.getCourseSet().add(course);
+        CourseScoreKey courseScoreKey = new CourseScoreKey(student_id, course_id);
+        CourseScore courseScore = new CourseScore(courseScoreKey, student, course, null);
+        student.getScores().add(courseScore);
         return studentRepository.save(student);
     }
 
     //A new student along with their course registrations.
     public Student addNewStudentAndRegistryCourse(String student_id, String student_name, List<String> course_id_list) throws CourseNotFoundException {
         Student student = new Student(student_id, student_name, new HashSet<>());
-        Set<Course> courseSet = student.getCourseSet();
-        for(String id : course_id_list) {
-            courseSet.add(findCourseById(id));
+        Set<CourseScore> courseScoreSet = student.getScores();
+
+        for(String course_id : course_id_list) {
+            Course course = findCourseById(course_id);
+            CourseScoreKey courseScoreKey = new CourseScoreKey(student_id, course_id);
+            CourseScore courseScore = new CourseScore(courseScoreKey, student, course, null);
+            courseScoreSet.add(courseScore);
         }
         return studentRepository.save(student);
     }
@@ -76,11 +83,26 @@ public class RegistrationDao {
     //Find all students register for a giving course and return a list sorted by name.
     public List<Student> findAllStudentsInACourse(String courseName) throws CourseNotFoundException {
         Course course = findCourseByName(courseName);
+        String course_id = course.getId();
+        return studentRepository.findAllStudentsInACourse(course_id);
+    }
+
+    //Find all students who don't register for a giving course.
+    public List<Student> findAllStudentsNotInACourse(String courseName) throws CourseNotFoundException {
+        Course course = findCourseByName(courseName);
+        String course_id = course.getId();
+        return studentRepository.findAllStudentsNotInACourse(course_id);
+    }
+
+/*
+    //Find all students register for a giving course and return a list sorted by name.
+    public List<Student> findAllStudentsInACourse(String courseName) throws CourseNotFoundException {
+        Course course = findCourseByName(courseName);
         List<Student> list = new ArrayList<>(course.getStudentSet());
         Collections.sort(list, (a1, a2) -> a1.getName().compareTo(a2.getName()));
         return list;
     }
-
+/*
     //Find all students who don't register for a giving course.
     public List<Student> findAllStudentsNotInACourse(String courseName) throws CourseNotFoundException {
         Course course = findCourseByName(courseName);
@@ -97,4 +119,6 @@ public class RegistrationDao {
     private boolean doesNotRegister(Set<Student> studentSet, Student student) {
         return !(studentSet.stream().anyMatch(a -> a.getId().equals(student.getId())));
     }
+
+ */
 }
